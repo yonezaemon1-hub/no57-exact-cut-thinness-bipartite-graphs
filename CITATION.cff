@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "Please cite the limited-scope preprint. Not human peer-reviewed. All rights reserved."
+title: "Exact Cut Thinness, Parity Obstructions, and Attainment Gaps in Complete Bipartite Graphs"
+authors:
+  - family-names: "Yonezu"
+    given-names: "Ryutaro"
+    affiliation: "Independent Researcher"
+version: "v1.0"
+date-released: "2026-11-06"
+doi: "10.5281/zenodo.24008712"
+url: "https://zenodo.org/records/24008712"
+preferred-citation:
+  type: article
+  title: "Exact Cut Thinness, Parity Obstructions, and Attainment Gaps in Complete Bipartite Graphs"
+  authors:
+    - family-names: "Yonezu"
+      given-names: "Ryutaro"
+      affiliation: "Independent Researcher"
+  year: 2026
+  version: "v1.0"
+  doi: "10.5281/zenodo.24008712"
+  publisher:
+    name: "Zenodo"
