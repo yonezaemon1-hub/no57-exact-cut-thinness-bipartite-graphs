@@ -50,7 +50,7 @@ python3 -B -I verify_k9_spectrum.py
 Python 3.10 or later is recommended. On Windows PowerShell, the two Python commands can also be run as `py -3 -B -I ...`. For the exact historical PowerShell workflow tested by the author, unpack `FROZEN_v0.9_ORIGINAL.zip`, enter `No57_v09`, then run:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .un_windows.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\run_windows.ps1
 ```
 
 The immutable historical runner prints a v0.9 HOLD label: that is its archived prepublication status, not the status of this public v1.0 preprint. Do not mix its manifest with the v1.0 manifest. The author's log reports the original archive hash, all 16 internal hashes, 21 K9 positive witnesses, 12 K9 hole certificates, seven K5 seeds and ALL PASS. Raw Windows transcripts, usernames, machine names, local paths and environment identifiers are not distributed.
