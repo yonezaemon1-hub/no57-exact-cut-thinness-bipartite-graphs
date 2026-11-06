@@ -4,6 +4,14 @@
 Research No.57 · Preprint v1.0 · 6 November 2026  
 **All rights reserved.**
 
+**Publication status: PUBLIC.**
+
+- Version DOI: [10.5281/zenodo.24008712](https://doi.org/10.5281/zenodo.24008712)
+- Zenodo preprint: https://zenodo.org/records/24008712
+- GitHub Release v1.0: https://github.com/yonezaemon1-hub/no57-exact-cut-thinness-bipartite-graphs/releases/tag/v1.0
+
+The DOI was added to repository metadata after publication. The PDF and reproducibility ZIP are unchanged on GitHub and Zenodo. The Release checksum attachment covers the original v1.0 tag snapshot; the main-branch manifest also includes this DOI/citation update.
+
 This limited-scope preprint studies exact cut thinness of complete bipartite graphs with fixed left size. It gives an even/odd attainment dichotomy, the first attainable right-part size for odd left size, exact small-left-size values, the K5/K7/K9 attainment spectra, and the K7 non-star threshold 189. First attainment does not mean attainment at every larger right-part size. The K5 n=62 correction and all twelve K9 post-attainment holes are retained.
 
 ## Research status and attribution
