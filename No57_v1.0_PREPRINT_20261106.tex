@@ -1,0 +1,338 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array}
+\usepackage{microtype}
+\usepackage[shortlabels]{enumitem}
+\usepackage[colorlinks=true,linkcolor=blue!55!black,urlcolor=blue!55!black,citecolor=blue!55!black]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newcommand{\al}{\alpha}
+\newcommand{\del}{\delta}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\bin}[2]{\binom{#1}{#2}}
+\newcommand{\KK}[2]{K_{#1,#2}}
+\newcommand{\delt}[2]{\delta_{#1}(#2)}
+\title{\bfseries Exact Cut Thinness, Parity Obstructions, and Attainment Gaps in Complete Bipartite Graphs}
+\author{Ryutaro Yonezu\\\small Independent Researcher}
+\date{Preprint v1.0 --- 6 November 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+For a spanning tree $T$ of a finite connected graph $G$, its combinatorial cut thinness is $\max_{\varnothing\ne S\subsetneq V(G)}|\del_T(S)|/|\del_G(S)|$. We study the minimum $\al(\KK{k}{n})$ over spanning trees of complete bipartite graphs with a fixed left part of size $k$. The singleton lower bound $2/k$ exhibits a sharp parity dichotomy: it is never attained for even $k\ge4$, while for odd $k\ge3$ its first attainment occurs exactly at $n=(k-1)(k^2+2)/2$. We give exact small-width formulas and finite attainment spectra for $k=5$ and $k=7$, including missing values after an initial attainment. A further exact classification for $k=9$ shows three intervals of nonattainment before permanent attainment from $n=356$. A weighted-cut argument bounds the first possible non-star skeleton for general odd $k$, and a sharper argument gives the exact non-star threshold $189$ when $k=7$. The assertions use explicit cuts, integer inequalities, and finite integer witnesses. Computational checks accompany but do not replace the stated proofs.
+\end{abstract}
+\noindent\textbf{Research status.} Limited-scope preprint v1.0. Independent AI mathematical audit: \textbf{PASS within the author-reported audited scope}; the v0.9 editorial and packaging review is also author-reported PASS. Windows PowerShell 5.1 reproduction: \textbf{PASS in the author-provided 6 November 2026 log}, not an independent Windows execution by the publication assistant. Novelty: \textbf{INCONCLUSIVE}. References: \textbf{PARTIAL}. Human peer review: \textbf{not performed}. All rights reserved.
+
+\section{Introduction and related work}
+Cut thinness is an established parameter: a spanning tree $T$ is $\epsilon$-thin when it crosses each vertex cut in at most an $\epsilon$ fraction of the corresponding graph edges. Mousavi Haji's 2018 thesis and Alghasi's 2023 thesis study precisely this combinatorial cut ratio \cite{mousavithesis,alghasi}. The general singleton-cut lower bound $1/\lambda(G)$, where $\lambda(G)$ is edge-connectivity, is already standard. Our specialized $2/k$ singleton bound for $\KK{k}{n}$ is an elementary degree-count consequence, not a new definition or a claimed general bound.
+
+Earlier bounds already apply to balanced complete bipartite graphs. Mousavi Haji's Theorem~2.3.5 states that, for a $d$-regular $d$-edge-connected graph with second adjacency eigenvalue $\lambda_2$, a spanning tree of cut thinness at most $6/(d-\lambda_2)$ can be constructed; hence $\al(\KK{n}{n})\le 6/n$ \cite{mousavithesis}. Stronger, Alghasi's spectral-thinness bound in Section~3.4.3 gives $\theta(\KK{n}{n})\le 4\cos^2(\pi/(2n))/n$ for $n\ge4$ \cite{alghasi}. Indeed, $L_T\preceq\theta L_G$ implies $|\del_T(S)|\le\theta|\del_G(S)|$ by testing the indicator vector of $S$, so $\al(G)\le\theta(G)$. Consequently $\al(\KK{n}{n})\le4\cos^2(\pi/(2n))/n$ is also a previously available \emph{combinatorial} upper bound. We do not claim that cut thinness on complete bipartite graphs was previously unstudied. Mousavi's 2020 journal article is related, but a full comparison against its publisher version has not been completed \cite{mousavijournal}.
+
+For nearby but distinct graph families, Mousavi Haji gave a $6/(n-2)$ combinatorial upper bound for crown graphs and Alghasi improved this to $4/(n-2)$; a crown graph is $\KK{n}{n}$ with a perfect matching removed \cite{mousavithesis,alghasi}. OpenAI's result family~174 asserts a universal $C/k$ existence bound and a deterministic polynomial-time construction for general $k$-edge-connected graphs, without identifying the graph-specific minimum, a sharp constant, or finite attainment thresholds for $\KK{k}{n}$ \cite{openaithin}. Klein, Olver and Yeoh treat near-minimum cuts, rather than the exact maximum over all cuts \cite{kleinolveryeoh}.
+
+The distinction examined in this manuscript is \emph{exact optimization and finite attainment} for the unbalanced family $\KK{k}{n}$ with fixed left size $k$. The results establish a parity obstruction, first attainment thresholds for odd $k$, exact small-left-size values, and post-attainment gaps. They should not be conflated with an existing asymptotic upper bound or presented as an exact characterization of all $\KK{k}{n}$ for arbitrary $k,n$. Spanning-tree congestion has exact results for complete bipartite and multipartite graphs, but uses original-graph congestion of the fundamental cut of each tree edge, not the all-cut ratio optimized here \cite{hruska,kozawa}. The complexity of verifying thinness of an input tree is a separate issue \cite{moayyedi}. Direct theorem-level overlap was not found in the accessible works cited, but the publisher-only journal text and comprehensive bibliographic-index coverage were not exhausted; novelty remains \textbf{INCONCLUSIVE}.
+
+For a finite simple connected graph $G$, define
+\begin{equation}\label{eq:def}
+\al_G(T)=\max_{\emptyset\ne S\subsetneq V(G)}\frac{|\del_T(S)|}{|\del_G(S)|},\qquad
+\al(G)=\min_{T\text{ spanning tree of }G}\al_G(T).
+\end{equation}
+Write $\KK{k}{n}$ for a complete bipartite graph, with $k$ left and $n$ right vertices. Unless otherwise stated $k\ge3$ and $n\ge2$. Since every tree has $n+k-1$ edges, some right vertex has degree at least two, and its singleton cut proves
+\begin{equation}\label{eq:singleton}
+\al(\KK{k}{n})\ge \frac2k.
+\end{equation}
+
+\section{The exact cut reduction}
+Suppose a tree $T$ meets the lower bound $2/k$. A right vertex of tree degree at least three would give a singleton ratio at least $3/k$, so all right degrees are at most two. Their total excess above one is $k-1$. Therefore precisely $k-1$ right vertices have degree two and all others degree one. Suppressing the degree-two right vertices gives a tree $H$ on the $k$ left vertices. Conversely, subdividing each edge of any left tree $H$ once and distributing $N=n-k+1$ right leaves amongst its left vertices produces such a tree, provided $N\ge0$.
+
+Write $x_i$ for the right leaves at left vertex $i$. For any fixed left subset $A$ of size $a$, let $j_r$ be the number of left neighbors of right vertex $r$ in $A$, and let $d_r\in\{1,2\}$ be its degree. Independently selecting the side of each right vertex gives the exact maximum
+\begin{equation}\label{eq:allcut}
+F_k(A)=-2an+\sum_{r\,\mathrm{right}}\max\{k j_r,\;k(d_r-j_r)-2(k-2a)\}.
+\end{equation}
+Thus $\al_G(T)\le2/k$ if and only if $F_k(A)\le0$ for all left subsets $A$. Cut complementation reduces attention to $0\le a\le\lfloor k/2\rfloor$. The case $a=0$ holds automatically because $d_r\le2$.
+
+For odd $k=2m+1$ and an $m$-vertex left set $A$, write $e(A)$ and $e(\bar A)$ for the numbers of edges of $H$ internally contained in $A$ and its complement. Directly expanding \eqref{eq:allcut} gives
+\begin{equation}\label{eq:slack}
+s_A:=n-2(k-1)-k e(A)-(k-2)e(\bar A)-2x_A\ge0,
+\qquad x_A=\sum_{i\in A}x_i.
+\end{equation}
+This family of integer inequalities is both a useful obstruction and a source of short certificates.
+
+For a star skeleton with center leaf count $c$, and outer counts $y_1\ge\cdots\ge y_{k-1}$, the general formula also gives a compact \emph{exact} criterion for positive witnesses. Put $N=c+\sum_i y_i=n-k+1$, $Y_a=\sum_{i=1}^a y_i$ (with $Y_0=0$), and $u_a=\max(0,4a-k)$. For each $1\le a\le\lfloor k/2\rfloor$, define
+\begin{align}\label{eq:starcriterion}
+F_{\mathrm{out}}(a)&=-2an+u_a N+(k-u_a)Y_a+a(5k-4-4a),\\
+F_{\mathrm{in}}(a)&=-2an+u_a N+(k-u_a)(c+Y_{a-1})+k(k+a-2).
+\end{align}
+These expressions maximize \eqref{eq:allcut} among left $a$-subsets, respectively excluding or including the center. Indeed, each selected leaf contributes $k$ while each unselected leaf contributes $u_a$ to the right-placement score; because $k-u_a>0$, the largest outer counts are selected. The degree-two connectors contribute the indicated constants. Therefore the star tree attains $2/k$ \emph{if and only if} all $2\lfloor k/2\rfloor$ integers in \eqref{eq:starcriterion} are nonpositive. No numerical optimization solver is needed to check a supplied row of the witness tables.
+
+\section{Parity and the first possible attainment}
+\begin{theorem}[Parity dichotomy]\label{thm:parity}
+For even $k\ge4$ and every finite $n\ge2$, $\al(\KK{k}{n})>2/k$. For odd $k\ge3$, the smallest $n$ with equality is
+\begin{equation}\label{eq:first}
+n_{\mathrm{first}}(k)=\frac{(k-1)(k^2+2)}2.
+\end{equation}
+\end{theorem}
+\begin{proof}
+If $k=2m$ and all right degrees are at most two, select a balanced $m$-vertex left set containing both endpoints of an edge of $H$. The ambient cut has $mn$ edges, independent of right-side placement. Put each right leaf opposite its parent and each degree-two connector on the side that maximizes its crossing contribution. The tree cut then has $n+h$ edges, where $h$ counts skeleton edges internal to either side of the balanced split. Our chosen edge implies $h\ge1$, so the ratio exceeds $2/k$. A right degree at least three also precludes equality.
+
+For odd $k=2m+1$, we prove the sharp bound. Summing \eqref{eq:slack} over all $\binom{k}{m}$ middle subsets yields
+\begin{equation}\label{eq:avgslack}
+\sum_{|A|=m}s_A=\frac{\binom{k}{m}}{k}\bigl(n-L\bigr),\qquad L=\frac{(k-1)(k^2+1)}2.
+\end{equation}
+Let $D$ consist of the odd-degree vertices of $H$. The handshaking lemma gives $|D|\in\{2,4,\ldots,k-1\}$, and
+\begin{equation}\label{eq:parityslack}
+s_A\equiv n-|A\cap D|\pmod2.
+\end{equation}
+We recall a middle-layer parity count. For an even $r=|D|$, among all $m$-subsets, each of the two parity classes of $|A\cap D|$ contains at least $\frac{m}{k}\binom{k}{m}$ subsets. One proof assigns signs $\sigma_i=-1$ for $i\in A$ and $+1$ otherwise, so $\sum_i\sigma_i=1$. With $E_r=\mathbb E[\prod_{i\in D}\sigma_i]$, symmetry gives
+$E_r=rE_{r-1}+(k-r)E_{r+1}$, $E_0=1$, $E_1=1/k$, whence
+\[
+E_{2s}=(-1)^s\frac{1\cdot3\cdots(2s-1)}{k(k-2)\cdots(k-2s+2)}.
+\]
+For $1\le s\le m$, the absolute values are at most $1/k$ (their successive ratios increase and the endpoint values both equal $1/k$). Thus each parity class has at least $\binom{k}{m}(1-1/k)/2=m\binom{k}{m}/k$ members. By \eqref{eq:parityslack}, at least that many nonnegative integer slacks are odd and hence at least one. Equation \eqref{eq:avgslack} forces $n\ge L+m=n_{\mathrm{first}}(k)$.
+
+For equality, take a star skeleton and place $z=km$ right leaves at \emph{each} left vertex. Its right-part size is $kz+(k-1)=n_{\mathrm{first}}(k)$. We check \eqref{eq:allcut}. For a left set of size $1\le a\le m$, set $u=\max(0,4a-k)$ and $d=k-2a$. The base and right-leaf contribution to the maximal scaled score is
+\[
+B(a)=-2an+z\,[ka+(k-a)u].
+\]
+If $4a\le k$, $B(a)=-ma(k^2+4)$, and the $k-1$ connectors contribute at most $2k(k-1)$; the sum is at most $-m(k-2)^2<0$. If $4a>k$, algebra gives $B(a)=-m(kd^2+4a)$. If the star center is outside $A$, the connector contribution is $a(5k-4-4a)$ and the combined score is at most $-m(d-1)[k(d+1)-2]\le0$. If the center is in $A$, the connector contribution is $k(k+a-2)$; at $d=1$ the score equals $-1$, and for $d\ge3$ it is at most $-9mk+k(k+m-2)<0$. The case $a=0$ is handled by the right-degree bound. Thus all cuts satisfy the $2/k$ criterion, and \eqref{eq:singleton} gives equality. 
+\end{proof}
+\begin{lemma}[Leaf extension]\label{lem:extension}
+For odd $k\ge3$, if $\al(\KK{k}{n})=2/k$, then $\al(\KK{k}{n+k})=2/k$.
+\end{lemma}
+\begin{proof}
+Take a witnessing tree and attach one new right leaf to each left vertex. For left subsets of size $1\le a\le m$, the change in the maximum scaled score in \eqref{eq:allcut} is exactly
+\[
+\Delta_k(a)=-ak+(k-a)\max(0,4a-k).
+\]
+If $4a\le k$ this is $-ak<0$; otherwise it is $-(k-2a)^2<0$. The $a=0$ cut remains admissible, and complementary cuts are equivalent. Therefore the enlarged tree attains the same singleton lower bound.\end{proof}
+
+\section{A general obstruction for non-star skeletons}
+\begin{lemma}[Weighted middle-cut certificate]\label{lem:nonstar}
+Let $k=2m+1\ge5$, and suppose $\al_T(\KK{k}{n})\le2/k$ with left skeleton $H$. For any $m$-subset $A$, put $B=V(H)\setminus A$ and
+$E(A)=m e_H(A)+(m-1)e_H(B)$. Then
+\begin{equation}\label{eq:weighted}
+n\ge(k-1)(2k-1)+2(k-1)E(A).
+\end{equation}
+If $H$ is not a star, in particular
+\begin{equation}\label{eq:nonstar}
+n\ge(k-1)(2k-1+2(m^2-1)).
+\end{equation}
+\end{lemma}
+\begin{proof}
+Form a multiset $W$ of $k$ middle subsets comprising $m$ copies of $A$ and all $m+1$ subsets of size $m$ of $B$. Every left vertex belongs to exactly $m$ members of $W$. The number of times an $H$-edge lies internally in a selected subset is $E(A)$ in total, while the total number of times an edge lies internally in the complement is $E(A)+(k-1)$. Summing \eqref{eq:slack} over $W$ gives the exact identity
+\[
+\sum_{C\in W}s_C=n-(k-1)(2k-1)-2(k-1)E(A).
+\]
+All summands are nonnegative, proving \eqref{eq:weighted}. For the final claim take a centroid $v$ of the odd-order tree $H$: every component of $H-v$ has at most $m$ vertices. Because $H$ is not a star, there is a path $v-u-w$ of length two. Remove the entire branch rooted at $u$; the remaining connected subtree containing $v$ has at least $m+1$ vertices. Select any connected $m$-vertex set $A$ therein. Then $e_H(A)=m-1$, while $H[B]$ contains the edge $uw$, so $e_H(B)\ge1$. Hence $E(A)\ge m(m-1)+(m-1)=m^2-1$ and \eqref{eq:nonstar} follows.\end{proof}
+
+\section{Exact results for small left parts}
+\begin{proposition}[Left part three]\label{prop:k3}
+For $n\ge3$, the values of $\al(\KK{3}{n})$ are
+\[
+\begin{array}{c|cccccccc|c}
+n&3&4&5&6&7&8&9&10&n\ge11\\\hline
+\al&1&5/6&3/4&3/4&8/11&9/13&9/13&11/16&2/3
+\end{array}
+\]
+\end{proposition}
+\begin{proof}
+Right-degree excess is two. A right degree-three vertex gives ratio $1$; otherwise two degree-two connectors form a path on the three left vertices. Distributing the remaining $n-2$ leaves as $(x,y,z)$ yields the exact all-cut formula
+\[
+R(n;x,y,z)=\max\left\{\frac23,\frac{n+1}{2n-1-x},\frac{n}{2n-2-y},\frac{n+1}{2n-1-z}\right\}.
+\]
+It follows by optimizing right-side placements for each left singleton, with other cuts covered by complement symmetry. For any proposed threshold $t\ge2/3$, a feasible triple exists precisely when the nonnegative capacities $A=2n-1-\lceil(n+1)/t\rceil$, $B=2n-2-\lceil n/t\rceil$ satisfy $2A+B\ge n-2$. Substitution for $3\le n\le10$ gives the tabulated values (witnesses and strict-threshold capacity checks are included in the frozen v0.2 note). At $t=2/3$, the inequalities become $2x\le n-5$, $2y\le n-4$, $2z\le n-5$. For odd $n\ge11$ take $(x,y,z)=((n-5)/2,3,(n-5)/2)$; for even $n\ge12$ take $((n-6)/2,4,(n-6)/2)$. The finite entries exclude all earlier attainment.\end{proof}
+
+\begin{proposition}[Left part four]\label{prop:k4}
+For $n\ge3$,
+\[
+\al(\KK{4}{n})=\begin{cases}
+5/6,&n=3,\\3/4,&n=4,\\2/3,&n=5,\\3/5,&n=6,\\4/7,&n=7,\\7/12,&n=8,\\(n+1)/(2n),&n\ge9.
+\end{cases}
+\]
+In particular the optimal value \emph{increases} from $n=7$ to $n=8$.
+\end{proposition}
+\begin{proof}
+A right degree of at least three forces thinness at least $3/4$. Otherwise three degree-two connectors contract to either a star or a path on the four left vertices. A balanced left split maximized over right placements has $n+h$ crossing tree edges and $2n$ crossing ambient edges, where $h\ge1$ counts skeleton edges internal to the two sides. The path gives $h\ge2$ on a suitable balanced split. For a star with leaf counts $(x_0,x_1,x_2,x_3)$, the exact all-cut maximum is
+\[
+\max\left\{\frac{n+1}{2n},\frac{x_0+3}{n},\frac{x_1+5}{n+4},\frac{x_2+5}{n+4},\frac{x_3+5}{n+4}\right\}.
+\]
+The witnesses $(0,0,0,1),(0,0,1,1),(0,1,1,1),(1,1,1,1),(0,1,2,2)$ at $n=4,5,6,7,8$ respectively meet the displayed values. For $n=4,5,6,8$, strict improvement violates the integer capacities forced by the singleton terms (and the path is worse); the $n=3$ case is isomorphic to $\KK{3}{4}$. For $n\ge9$ choose four nonnegative leaf counts summing to $n-3$, each at most $\lfloor(n-5)/2\rfloor$; this is possible and makes every singleton term at most $(n+1)/(2n)$.\end{proof}
+
+\begin{theorem}[Attainment and holes for $k=5$]\label{thm:k5}
+For $n\ge2$, $\al(\KK{5}{n})=2/5$ exactly when $n\in\{54,55\}$ or $n\ge58$. Moreover
+\[
+\al(\KK{5}{56})=\frac{57}{142},\qquad\al(\KK{5}{57})=\frac{59}{147}.
+\]
+\end{theorem}
+\begin{proof}
+Theorem \ref{thm:parity} excludes $n<54$. Any tree meeting $2/5$ has four degree-two right connectors, giving one of three five-vertex skeletons: star, path or fork. For a left singleton $i$ and a left pair $A$ the exact right-maximized inequalities are, respectively,
+\[
+5x_i+d_H(i)+16\le2n,\qquad 2x_A+5e_H(A)+3e_H(\bar A)\le n-8.
+\]
+The following stars furnish explicit witnesses at $54,55$ and at every integer from $58$ through $62$. The entries are the center leaf count $c$ followed by four outer leaf counts $(y_1,y_2,y_3,y_4)$. In each case $c+\sum_i y_i=n-4$, and substitution into the exact star inequalities \eqref{eq:starcriterion} yields nonpositive scores.
+\begin{center}
+\begin{tabular}{c@{\qquad}c}
+\toprule
+$n$ & $(c;y_1,y_2,y_3,y_4)$\\
+\midrule
+$54$ & $(10;10,10,10,10)$\\
+$55$ & $(11;10,10,10,10)$\\
+$58$ & $(10;11,11,11,11)$\\
+$59$ & $(11;11,11,11,11)$\\
+$60$ & $(11;12,11,11,11)$\\
+$61$ & $(12;12,11,11,11)$\\
+$62$ & $(10;12,12,12,12)$\\
+\bottomrule
+\end{tabular}
+\end{center}
+For the previously omitted $n=62$ witness, the four exact star scores $F_{\mathrm{out}}(1)$, $F_{\mathrm{in}}(1)$, $F_{\mathrm{out}}(2)$, $F_{\mathrm{in}}(2)$ are respectively $-47,-54,0,-5$, so all cuts satisfy $2/5$. The five consecutive witnesses $n=58,59,60,61,62$ represent all residue classes modulo five; applying Lemma \ref{lem:extension} repeatedly then covers \emph{every} $n\ge58$.
+
+For $n=56,57$ we use a stronger strict-threshold argument. Put $t_{56}=57/142$ and $t_{57}=59/147$. For a star skeleton, the necessary strict pair capacities for a tree with ratio $<t_n$ are
+\[
+\begin{array}{c|cc}
+n&c+y_i&y_i+y_j\\\hline
+56&\le21&\le21\\57&\le22&\le21
+\end{array}
+\quad(i\ne j).
+\]
+The six pair bounds imply $\sum_{i=1}^4y_i\le41$ (sum 42 would force all four $y_i=10.5$). For $n=56$, $c\le10$ gives $c+\sum y_i\le51$ and $c\ge11$ gives $c+\sum y_i\le84-3c\le51$, contrary to $n-4=52$. For $n=57$ the corresponding bounds are $\le52$, contrary to $n-4=53$. For path/fork, summing the five cyclic pair capacities $(01,12,23,34,40)$ gives, at $(n,t)=(56,t_{56}),(57,t_{57})$, upper totals $99,99$ for the path and $102,103$ for the fork, against required totals $2(n-4)=104,106$. Right degrees at least three have ratio $\ge3/5>t_n$. Therefore no tree has ratio strictly below $t_n$. The stars with leaf counts $(11,11,10,10,10)$ at $n=56$ and $(9,11,11,11,11)$ at $n=57$ satisfy the exact cut bound at $t_n$, with a matching cut. This proves both exact values, which exceed $2/5$.\end{proof}
+
+\section{The complete $k=7$ spectrum and a non-star threshold}
+\begin{theorem}[Seven-left attainment spectrum]\label{thm:k7}
+For every $n\ge2$,
+\[
+\al(\KK{7}{n})=\frac27 \iff n\in\{153,154,159,160,161,162\}\ \text{or}\ n\ge165.
+\]
+\end{theorem}
+\begin{proof}
+Theorem \ref{thm:parity} rules out $n\le152$. For $k=7$ and each left triple $A$, \eqref{eq:slack} reads $s_A=n-12-7e_H(A)-5e_H(\bar A)-2x_A\ge0$. If $H$ is not a star, Lemma \ref{lem:nonstar} with $m=3$ gives $n\ge174$, excluding non-stars from every remaining exceptional $n<165$.
+
+For a star, let $c$ be the center leaf count, and $y_1\ge\cdots\ge y_6$ the outer counts. Write $N=n-6$, $P=\lfloor(n-27)/2\rfloor$, and $Q=\lfloor(n-26)/2\rfloor$. Triple cuts force
+\begin{equation}\label{eq:k7pq}
+y_1+y_2+y_3\le P,\quad c+y_1+y_2\le Q,\quad c+\sum_{i=1}^6y_i=N.
+\end{equation}
+Since $y_3\le\lfloor P/3\rfloor$, the first inequality implies $\sum_i y_i\le P+3\lfloor P/3\rfloor=:U$. Pairing the six sorted terms also gives $\sum_i y_i\le3(Q-c)$. Hence
+\begin{equation}\label{eq:k7bound}
+N-U\le c\le \left\lfloor\frac{3Q-N}{2}\right\rfloor.
+\end{equation}
+For $n=155,156,157,158$ the lower and upper bounds are $(22,21),(23,22),(23,22),(24,23)$, contradictions. For $n=163,164$ both sides force $c=23$ and $c=24$ respectively. Saturation of the sorted sum yields $y_1+y_2=46$, contradicting $c+y_1+y_2\le Q$, because the left side is $69>68$ and $70>69$ respectively.
+
+For the positive cases, star skeletons with center count $c$ and six outer counts sorted decreasing are certified by the six inequalities
+\[
+\begin{array}{ll}
+7c+42\le2n,&7y_1+27\le2n,\\
+6(c+y_1)+43\le3n,&6(y_1+y_2)+40\le3n,\\
+2(c+y_1+y_2)+26\le n,&2(y_1+y_2+y_3)+27\le n.
+\end{array}
+\]
+The frozen v0.6 proof gives witnesses at $153,154,159$--$162$ and at each of $165$--$171$. Direct substitution meets all six inequalities. These are exactly the singleton, pair and triple conditions for a star, after optimizing each right vertex. Lemma \ref{lem:extension} extends the seven seeds $165$--$171$ to all $n\ge165$.\end{proof}
+
+\begin{theorem}[First non-star witness for seven left vertices]\label{thm:k7nonstar}
+The smallest $n$ for which a $2/7$-thin spanning tree of $\KK{7}{n}$ can have a non-star left skeleton is $n=189$.
+\end{theorem}
+\begin{proof}
+The special case of \eqref{eq:weighted} for a left triple $A$ is
+\[
+\sum_{C\in W}s_C=n-78-12\bigl(3e_H(A)+2e_H(\bar A)\bigr),
+\]
+where $W$ contains three copies of $A$ and all four triples of its complement. If the seven-vertex tree $H$ has maximum degree at most four, it has an induced three-vertex path with degree sum at most six. (For diameter six the endpoint triple has degree sum five. For diameter five there is one off-path vertex, so one of the endpoint triples has degree sum at most six. For diameter four there are two off-path vertices; unless one endpoint triple has degree sum at most six, both branches attach to the middle path vertex, giving an induced leaf--center--leaf path of degree sum six. At diameter three the tree is a double-star with five leaves; if its maximum degree is at most four, one center has two or three leaf neighbors, and these together with the center give a path of degree sum at most six. Smaller diameter would force a star.) Taking this path as $A$ gives $e(A)=2$ and $e(\bar A)\ge2$, hence $n\ge78+12(6+4)=198$.
+
+The remaining non-star skeleton has maximum degree five and is a subdivided star. Denote its center by $o$, its degree-two neighbor by $p$, the terminal leaf by $t$, and four ordinary leaves by $a,b,c,d$. Choose $A=\{p,t,a\}$: then $e(A)=1$, $e(\bar A)=3$ and the seven-slack sum is $n-186$. The odd-degree vertices of $H$ are all except $p$. Modulo two each $s_C$ is congruent to $n-|C\cap D|$. If $n$ is even, the four complement triples have odd slacks, forcing $n-186\ge4$. If $n$ is odd, the slack of $A$ is odd and appears three times, forcing $n-186\ge3$. Thus every non-star requires $n\ge189$.
+
+At $n=189$, take skeleton edges $01,12,03,04,05,06$ and leaf multiplicities \(25,29,21,27,27,27,27\).\par\smallskip\noindent In \eqref{eq:allcut}, the symmetry of vertices $3,4,5,6$ reduces all 128 left subsets to 40 integer values, all nonpositive. The full table and direct-neighbor checker are in the frozen v0.7 addendum. A degree-two connector gives a singleton ratio $2/7$, so the bound is attained.\end{proof}
+
+\section{A new complete attainment spectrum for $k=9$}
+\begin{theorem}[Nine-left exact finite spectrum]\label{thm:k9}
+For every integer $n\ge2$,
+\begin{equation}\label{eq:k9spectrum}
+\al(\KK{9}{n})=\frac29\quad\Longleftrightarrow\quad
+\left\{\begin{array}{l}
+n=332,333;\\
+340\le n\le343;\\
+348\le n\le353;\\
+\text{or }n\ge356.
+\end{array}\right.
+\end{equation}
+In particular the twelve post-attainment holes are $334$--$339$, $344$--$347$, and $354$--$355$.
+\end{theorem}
+\begin{proof}
+Theorem \ref{thm:parity} excludes $n\le331$. If a tree meets $2/9$ and its left skeleton is not a star, Lemma \ref{lem:nonstar} with $m=4$ forces
+\[
+n\ge8\,[17+2(4^2-1)]=376.
+\]
+Hence any possible $2/9$ witness for $n<376$ must have a \emph{star} skeleton.
+
+For a star let $c$ denote its center leaves and $y_1\ge\cdots\ge y_8\ge0$ its sorted outer leaf counts, so
+$c+\sum_i y_i=n-8=:N$. Examine four-left-vertex sets in \eqref{eq:allcut}. For a set consisting of four outer vertices, the right-maximized cut condition is $2\sum_{i=1}^{4}y_i+44\le n$. For a set comprising the center and three outer vertices it is $2(c+\sum_{i=1}^3y_i)+43\le n$. Thus with
+\[
+P=\left\lfloor\frac{n-44}{2}\right\rfloor,\qquad
+Q=\left\lfloor\frac{n-43}{2}\right\rfloor
+\]
+we necessarily have $y_1+\cdots+y_4\le P$ and $c+y_1+y_2+y_3\le Q$. The ordering gives $y_4\le\lfloor P/4\rfloor$, so
+\[
+ c+y_1+y_2+y_3 =N-(y_4+\cdots+y_8)
+ \ge N-5\left\lfloor\frac P4\right\rfloor.
+\]
+Consequently \emph{every} attaining star must satisfy the arithmetic obstruction
+\begin{equation}\label{eq:k9arithmetic}
+n-8-5\left\lfloor\frac14\left\lfloor\frac{n-44}{2}\right\rfloor\right\rfloor
+\le\left\lfloor\frac{n-43}{2}\right\rfloor.
+\end{equation}
+Direct integer substitution shows that \eqref{eq:k9arithmetic} fails exactly at $334$--$339$, $344$--$347$, and $354$--$355$ in the interval $332\le n\le355$. These twelve values are therefore impossible for stars. They are below 376 and so are impossible for non-stars as well.
+
+To show sufficiency, Table \ref{tab:k9witness} supplies star witnesses at $332,333,340$--$343,348$--$353$, and at the nine consecutive values $356$--$364$. Each row has $c+\sum y_i=n-8$, and direct substitution into the eight exact inequalities in \eqref{eq:starcriterion} gives nonpositive values. As a separate check, the accompanying integer program builds the full graph and independently verifies $F_9(A)\le0$ for all $2^9=512$ left subsets $A$. Thus all listed finite stars attain $2/9$. The nine consecutive seeds $356$--$364$, together with Lemma \ref{lem:extension}, give witnesses for every $n\ge356$. No exhaustive MILP infeasibility is used to establish the twelve holes.\end{proof}
+
+\begin{longtable}{@{}r r l@{}}
+\caption{Explicit $\KK{9}{n}$ star witnesses: center count $c$ and eight outer leaf counts $y$. Every row has an exact all-cut score at most zero.}\label{tab:k9witness}\\
+\toprule $n$&$c$&$y=(y_1,\ldots,y_8)$ \\ \midrule
+\endfirsthead
+\toprule $n$&$c$&$y=(y_1,\ldots,y_8)$ \\ \midrule
+\endhead
+332&36&$(36,36,36,36,36,36,36,36)$\\
+333&37&$(36,36,36,36,36,36,36,36)$\\
+340&36&$(37,37,37,37,37,37,37,37)$\\
+341&37&$(37,37,37,37,37,37,37,37)$\\
+342&37&$(38,37,37,37,37,37,37,37)$\\
+343&38&$(38,37,37,37,37,37,37,37)$\\
+348&36&$(38,38,38,38,38,38,38,38)$\\
+349&37&$(38,38,38,38,38,38,38,38)$\\
+350&38&$(39,38,38,38,38,38,38,37)$\\
+351&39&$(39,38,38,38,38,38,38,37)$\\
+352&38&$(39,39,38,38,38,38,38,38)$\\
+353&39&$(39,39,38,38,38,38,38,38)$\\
+356&36&$(39,39,39,39,39,39,39,39)$\\
+357&37&$(39,39,39,39,39,39,39,39)$\\
+358&39&$(40,39,39,39,39,39,38,38)$\\
+359&40&$(40,39,39,39,39,39,38,38)$\\
+360&38&$(40,40,39,39,39,39,39,39)$\\
+361&39&$(40,40,39,39,39,39,39,39)$\\
+362&39&$(40,40,40,39,39,39,39,39)$\\
+363&40&$(40,40,40,39,39,39,39,39)$\\
+364&36&$(40,40,40,40,40,40,40,40)$\\
+\bottomrule
+\end{longtable}
+
+\section{Discussion, reproducibility, and limitations}
+The parameter $\al(G)$ is established in prior thin-tree literature; we do not introduce a new general definition. What these calculations provide is a sequence of explicit exact phenomena in $\KK{k}{n}$: an odd/even finite-attainment dichotomy, an exact first odd threshold, post-attainment gaps in several odd left sizes, and separate thresholds for star and non-star skeletons. In particular, $\al(\KK{4}{n})$ is not monotone in $n$ and the property $\al(\KK{k}{n})=2/k$ need not be monotone in $n$ even for odd $k$.
+
+The supplementary \texttt{verify\_k5\_seeds.py} independently checks the seven star witnesses used for the $k=5$ leaf-extension argument, including the restored $n=62$ seed. The accompanying \texttt{verify\_k9\_spectrum.py} uses Python standard-library integer arithmetic only. It constructs all right vertices for each of the 21 new star witnesses and computes the exact maximum scaled score over all 512 left masks. It also checks the twelve arithmetic hole inequalities, the $+9$ extension deltas, and one weighted-slack identity. The symbolic centroid and parity lemmas are written above; checker success alone is not their proof. Earlier v0.2--v0.7 proofs and evidence are preserved in their original source packages; this manuscript does not alter those frozen sources. No private Windows raw logs are included.
+
+Author-provided independent AI audit reports cover the v0.7 non-star threshold and witness, a v0.8 mathematical review including independent $k=9$ optimization, the v0.8.1 differential review after repair of the $k=5$, $n=62$ seed, and the v0.9 editorial and packaging review. These reported results are not human peer review or a new independent mathematical audit by the publication assistant. The author-provided Windows PowerShell 5.1 log dated 6 November 2026 reports successful original-archive and internal-hash checks, 21 $k=9$ positive witnesses, 12 nonattainment certificates, and seven $k=5$ seeds. The publication assistant inspected that log and reran the two unchanged Python checkers on Linux; it did not independently execute them on Windows. The reproduced checkers verify finite witness and arithmetic claims, not the symbolic proofs. Bibliographic screening covers accessible sources, but publisher-only full-text and indexing checks are incomplete; thus \textbf{NOVELTY INCONCLUSIVE / REFERENCES PARTIAL}. This is a limited-scope public preprint, with no human peer review. Raw Windows logs are not distributed.
+
+\begin{thebibliography}{99}
+\bibitem{mousavithesis} S. R. Mousavi Haji, \emph{Thin Trees in Some Families of Graphs}, Master's thesis, University of Waterloo, 2018. \url{https://uwspace.uwaterloo.ca/items/350c2124-ad71-451b-b934-a4db7e029ec5}.
+\bibitem{mousavijournal} R. Mousavi, ``Thin trees in some families of distance-regular graphs,'' \emph{Linear and Multilinear Algebra}, 68(7):1374--1383, 2020 (online 2018). \href{https://doi.org/10.1080/03081087.2018.1543384}{doi:10.1080/03081087.2018.1543384}.
+\bibitem{alghasi} M. Alghasi, \emph{Combinatorially Thin Trees and Spectrally Thin Trees in Structured Graphs}, thesis, University of Waterloo, 2023. \url{https://uwspace.uwaterloo.ca/items/3b0bec26-2b32-4445-a120-c78fedd16b2b}.
+\bibitem{openaithin} OpenAI, ``The strong thin tree conjecture'' and ``A polynomial-time construction of strong thin trees,'' mathematical release, 23 September 2026. \url{https://github.com/openai/math/blob/main/lean/docs/174.md}.
+\bibitem{kleinolveryeoh} N. Klein, N. Olver, and Z. S. Yeoh, ``Thin Trees for near Minimum Cuts,'' \emph{ICALP 2026}, LIPIcs 374, article 129. \href{https://doi.org/10.4230/LIPIcs.ICALP.2026.129}{doi:10.4230/LIPIcs.ICALP.2026.129}.
+\bibitem{hruska} S. W. Hruska, ``On tree congestion of graphs,'' \emph{Discrete Mathematics} 308(10):1801--1809, 2008. \href{https://doi.org/10.1016/j.disc.2007.04.030}{doi:10.1016/j.disc.2007.04.030}.
+\bibitem{kozawa} K. Kozawa, Y. Otachi, and K. Yamazaki, ``On spanning tree congestion of graphs,'' \emph{Discrete Mathematics} 309(13):4215--4224, 2009. \href{https://doi.org/10.1016/j.disc.2008.12.021}{doi:10.1016/j.disc.2008.12.021}.
+\bibitem{moayyedi} A. Moayyedi, ``Thin Tree Verification is coNP-Complete,'' arXiv:2512.25043 (2025). \url{https://arxiv.org/abs/2512.25043}.
+\end{thebibliography}
+\end{document}
