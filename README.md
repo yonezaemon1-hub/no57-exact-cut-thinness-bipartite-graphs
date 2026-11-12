@@ -74,3 +74,10 @@ The original v0.9 archive contains historical HOLD notes and earlier immutable p
 ## v0.9 → v1.0
 
 Only three source locations change: date/version label, research-status paragraph, and the audit/reproduction/publication-status paragraph. Every other LaTeX byte, including the abstract, contextual formulas, bibliography, all theorems, proofs, constants and witness tables, is unchanged. The protected mathematical-region SHA256 is `af46618ac71024648fbf52b57a1cad0d87b15c4276993ad2e019bb6fbd323e33`. Frozen code and evidence are unchanged. The original v0.9 ZIP SHA256 is `8574d944ed95ac48782f9f435859bb1d78c51f137b820b898a940c712018e8cd`.
+
+## Author correspondence (metadata update, 2026-11-12)
+
+**Ryutaro Yonezu — Independent Researcher**  
+Research correspondence: **yonezaemon1+research@gmail.com**
+
+This contact-information addition does not revise any mathematical claims, frozen verification files, published preprint PDF, release assets, DOI, or existing SHA256 checksums.
